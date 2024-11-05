@@ -8,15 +8,15 @@ Created on Tue Nov  5 10:18:33 2024
 import streamlit as st
 import pandas as pd
 import numpy as np
-from sklearn.datasets import load_boston
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.datasets import fetch_california_housing
 
-# Load the Boston housing dataset
-boston = load_boston()
-X = pd.DataFrame(boston.data, columns=boston.feature_names)
-y = pd.DataFrame(boston.target, columns=["MEDV"])
+# Load the California housing dataset
+housing = fetch_california_housing()
+X = pd.DataFrame(housing.data, columns=housing.feature_names)
+y = pd.DataFrame(housing.target, columns=["MedHouseVal"])
 
 # Standardize the data
 scaler = StandardScaler()
@@ -28,12 +28,12 @@ model = LinearRegression()
 model.fit(X_train, y_train)
 
 # Streamlit App UI
-st.title("Boston Housing Price Prediction")
+st.title("California Housing Price Prediction")
 
 # Sidebar for input
 st.sidebar.header("Adjust the sliders to predict house price")
 
-# Create sliders for all the numerical features in the Boston dataset
+# Create sliders for all the numerical features in the California housing dataset
 slider_inputs = {}
 for feature in X.columns:
     slider_inputs[feature] = st.sidebar.slider(f"{feature}", 
@@ -52,8 +52,8 @@ input_data_scaled = scaler.transform(input_data)
 predicted_price = model.predict(input_data_scaled)
 
 # Display the prediction
-st.subheader("Predicted House Price (MEDV):")
-st.write(f"${predicted_price[0][0]:,.2f}")
+st.subheader("Predicted House Price (MedHouseVal):")
+st.write(f"${predicted_price[0][0] * 100000:,.2f}")  # Multiply by 100,000 to adjust to house price
 
 # Optional: Show model coefficients (useful for insight)
 st.subheader("Model Coefficients:")
@@ -66,3 +66,4 @@ st.write(coeff_df)
 # Show the actual vs predicted (on test set)
 st.subheader("Model Performance (on Test Set)")
 st.write(f"R² Score: {model.score(X_test, y_test):.4f}")
+
